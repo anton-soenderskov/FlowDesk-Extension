@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowDesk</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>FlowDesk</h1>
+                <p class="subtitle">Block distracting sites</p>
+            </div>
+            <label class="toggle" title="Enable / disable blocking">
+                <input type="checkbox" id="enabledToggle">
+                <span class="toggle-track">
+                    <span class="toggle-thumb"></span>
+                </span>
+                <span class="toggle-label" id="toggleLabel">Off</span>
+            </label>
+        </header>
+
+        <div class="add-section">
+            <div class="input-row">
+                <input type="text" id="siteInput" placeholder="Add Button" autocomplete="off" spellcheck="false" />
+                <button id="addBtn">Add</button>
+            </div>
+            <p class="error-msg" id="errorMsg"></p>
+        </div>
+
+        <div class="list-section">
+            <p class="list-label">Blocked sites <span id="count">0</span></p>
+            <ul id="siteList"></ul>
+            <p class="empty-msg" id="emptyMsg">No sites blocked yet.</p>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
+
+</html>

@@ -1,0 +1,293 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    background: #111;
+    color: #e8e8e8;
+    width: 290px;
+}
+
+.container {
+    padding: 16px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── Header ─────────────────────────────────── */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-left h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+.header-left .subtitle {
+    font-size: 11px;
+    color: #555;
+    margin-top: 2px;
+}
+
+/* ── Toggle ─────────────────────────────────── */
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle input {
+    display: none;
+}
+
+.toggle-track {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 999px;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+}
+
+.toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 12px;
+    height: 12px;
+    background: #555;
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+}
+
+/* checked state */
+.toggle input:checked~.toggle-track {
+    background: #1a4fd6;
+    border-color: #2b5ef0;
+}
+
+.toggle input:checked~.toggle-track .toggle-thumb {
+    transform: translateX(16px);
+    background: #fff;
+}
+
+.toggle-label {
+    font-size: 11px;
+    color: #555;
+    min-width: 18px;
+    transition: color 0.2s;
+}
+
+.toggle input:checked~.toggle-label {
+    color: #4a80ff;
+}
+
+/* ── Status banner ───────────────────────────── */
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.status-bar.active {
+    background: #0d1f4a;
+    border-color: #1a3a80;
+    color: #6ea0ff;
+}
+
+.status-bar.inactive {
+    background: #1e1e1e;
+    border-color: #2a2a2a;
+    color: #555;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-bar.active .status-dot {
+    background: #4a80ff;
+}
+
+.status-bar.inactive .status-dot {
+    background: #3a3a3a;
+}
+
+/* ── Add section ─────────────────────────────── */
+.input-row {
+    display: flex;
+    gap: 6px;
+}
+
+input[type="text"] {
+    flex: 1;
+    background: #1e1e1e;
+    border: 1px solid #2e2e2e;
+    border-radius: 5px;
+    color: #e8e8e8;
+    font-size: 12px;
+    padding: 7px 9px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+input[type="text"]:focus {
+    border-color: #444;
+}
+
+input[type="text"]::placeholder {
+    color: #444;
+}
+
+input[type="text"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+button#addBtn {
+    background: #1a4fd6;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 13px;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+button#addBtn:hover:not(:disabled) {
+    background: #2b5ef0;
+}
+
+button#addBtn:active:not(:disabled) {
+    background: #1240b8;
+}
+
+button#addBtn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.error-msg {
+    color: #d95f5f;
+    font-size: 11px;
+    min-height: 14px;
+    margin-top: 4px;
+}
+
+/* ── List section ────────────────────────────── */
+.list-label {
+    font-size: 10px;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 7px;
+}
+
+.list-label #count {
+    color: #555;
+}
+
+#siteList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#siteList::-webkit-scrollbar {
+    width: 3px;
+}
+
+#siteList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#siteList::-webkit-scrollbar-thumb {
+    background: #2e2e2e;
+    border-radius: 2px;
+}
+
+.site-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1a1a1a;
+    border: 1px solid #252525;
+    border-radius: 5px;
+    padding: 6px 9px;
+    animation: slideIn 0.12s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.site-item .site-name {
+    font-size: 12px;
+    color: #bbb;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.site-item .remove-btn {
+    background: none;
+    border: none;
+    color: #3a3a3a;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 0 2px;
+    margin-left: 8px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+
+.site-item .remove-btn:hover {
+    color: #c95555;
+}
+
+.empty-msg {
+    font-size: 12px;
+    color: #3a3a3a;
+    text-align: center;
+    padding: 14px 0 2px;
+}
