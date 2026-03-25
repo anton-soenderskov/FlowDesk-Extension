@@ -13,7 +13,7 @@
         <header>
             <div class="header-left">
                 <h1>FlowDesk</h1>
-                <p class="subtitle">Block distracting sites</p>
+                <p class="subtitle">site blocker</p>
             </div>
             <label class="toggle" title="Enable / disable blocking">
                 <input type="checkbox" id="enabledToggle">
@@ -24,25 +24,33 @@
             </label>
         </header>
 
+        <div class="status-bar inactive" id="statusBar">
+            <span class="status-dot"></span>
+            <span id="statusText">Blocking inactive</span>
+        </div>
+
+        <div class="divider"></div>
+
         <div class="add-section">
             <div class="input-row">
-                <input type="text" id="siteInput" placeholder="Add Button" autocomplete="off" spellcheck="false" />
+                <input type="text" id="siteInput" placeholder="reddit.com" autocomplete="off" spellcheck="false" />
                 <button id="addBtn">Add</button>
             </div>
             <p class="error-msg" id="errorMsg"></p>
         </div>
 
         <div class="list-section">
-            <p class="list-label">Blocked sites <span id="count">0</span></p>
+            <p class="list-label">Blocked sites &mdash; <span id="count">0</span></p>
             <ul id="siteList"></ul>
-            <p class="empty-msg" id="emptyMsg">No sites blocked yet.</p>
+            <p class="empty-msg" id="emptyMsg">no sites blocked yet</p>
         </div>
 
+        <div class="divider"></div>
 
         <div class="timer-section">
             <div class="timer-information">
-                <span class="timer-label">Time remaining: </span>
-                <span id="timerDisplay"></span>
+                <span class="timer-label">remaining</span>
+                <span class="timerDisplay" id="timerDisplay">0:00</span>
             </div>
             <button class="timerBtn">+5 min</button>
         </div>

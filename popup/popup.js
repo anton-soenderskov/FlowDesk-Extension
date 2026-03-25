@@ -1,8 +1,7 @@
 const STORAGE_KEY = 'blockedSites';
 const ENABLED_KEY = 'blockingEnabled';
-const TIMER_KEY = 'currentTime';
+const TIMER_END_KEY = 'timerEndAt';
 
-let currentTime = 0;
 let countdownInterval = null;
 
 const siteInput = document.getElementById('siteInput');
@@ -15,6 +14,8 @@ const toggle = document.getElementById('enabledToggle');
 const toggleLabel = document.getElementById('toggleLabel');
 const timerBtn = document.querySelector('.timerBtn');
 const timerDisplay = document.getElementById('timerDisplay');
+const statusBar = document.getElementById('statusBar');
+const statusText = document.getElementById('statusText');
 
 // ── Helpers ────────────────────────────────────
 
@@ -57,6 +58,11 @@ function applyEnabledState(enabled) {
     toggleLabel.textContent = enabled ? 'On' : 'Off';
     siteInput.disabled = !enabled;
     addBtn.disabled = !enabled;
+
+    if (statusBar) {
+        statusBar.className = 'status-bar ' + (enabled ? 'active' : 'inactive');
+        statusText.textContent = enabled ? 'Blocking active' : 'Blocking inactive';
+    }
 }
 
 // ── Render list ────────────────────────────────
@@ -113,68 +119,65 @@ function removeSite(domain) {
 }
 
 function addTime() {
-    currentTime += 5 * 60;
-    updateTimerDisplay();
-    startCountdown();
+    chrome.storage.local.get(TIMER_END_KEY, (result) => {
+        const now = Date.now();
+        const currentEnd = result[TIMER_END_KEY] || now;
+        const base = currentEnd > now ? currentEnd : now;
+        const newEnd = base + 5 * 60 * 1000;
 
-    saveEnabled(true, () => applyEnabledState(true));
+        chrome.storage.local.set({ [TIMER_END_KEY]: newEnd });
+        saveEnabled(true, () => applyEnabledState(true));
+        startCountdown(newEnd);
+    });
 }
 
-function updateTimerDisplay() {
-    const minutes = Math.floor(currentTime / 60);
-    const seconds = currentTime % 60;
+function updateTimerDisplay(remainingMs) {
+    const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
     timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-function startCountdown() {
-    if (countdownInterval) return; // already running
+function startCountdown(endAt) {
+    if (countdownInterval) clearInterval(countdownInterval);
     countdownInterval = setInterval(() => {
-        if (currentTime <= 0) {
+        const remaining = endAt - Date.now();
+        if (remaining <= 0) {
             clearInterval(countdownInterval);
             countdownInterval = null;
-            currentTime = 0;
-            updateTimerDisplay();
-            chrome.storage.local.set({ [TIMER_KEY]: currentTime });
-            saveEnabled(false, () => applyEnabledState(false));
+            updateTimerDisplay(0);
             return;
         }
-        currentTime--;
-        updateTimerDisplay();
-        chrome.storage.local.set({ [TIMER_KEY]: currentTime });
-    }, 1000);
+        updateTimerDisplay(remaining);
+    }, 500);
 }
-
 
 // ── Init ───────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Load both values in one go
-    chrome.storage.local.get([STORAGE_KEY, ENABLED_KEY, TIMER_KEY], (result) => {
+    chrome.storage.local.get([STORAGE_KEY, ENABLED_KEY, TIMER_END_KEY], (result) => {
         renderList(result[STORAGE_KEY] || []);
         applyEnabledState(result[ENABLED_KEY] ?? false);
-        currentTime = result[TIMER_KEY] || 0;
-        updateTimerDisplay();
-        if (currentTime > 0) startCountdown();
+
+        const endAt = result[TIMER_END_KEY] || 0;
+        const remaining = endAt - Date.now();
+        updateTimerDisplay(Math.max(0, remaining));
+        if (remaining > 0) startCountdown(endAt);
     });
 
-    timerBtn.addEventListener('click', () => {
-        addTime();
-        chrome.storage.local.set({ [TIMER_KEY]: currentTime });
-    });
+    timerBtn.addEventListener('click', addTime);
 
     toggle.addEventListener('change', () => {
-        if (!toggle.checked && currentTime > 0) {
-            toggle.checked = true;
-            return;
-        }
-        saveEnabled(toggle.checked, () => applyEnabledState(toggle.checked));
+        chrome.storage.local.get(TIMER_END_KEY, (r) => {
+            if (!toggle.checked && r[TIMER_END_KEY] > Date.now()) {
+                toggle.checked = true;
+                return;
+            }
+            saveEnabled(toggle.checked, () => applyEnabledState(toggle.checked));
+        });
     });
 
     addBtn.addEventListener('click', addSite);
-
-    siteInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') addSite();
-    });
-
+    siteInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addSite(); });
     siteInput.addEventListener('input', clearError);
 });
