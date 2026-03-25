@@ -202,6 +202,43 @@ button#addBtn:disabled {
     margin-top: 4px;
 }
 
+/* ── Timer section ────────────────────────────── */
+.timer-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.timerBtn {
+    background: #1a4fd6;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 13px;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.timer-information {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.timer-label {
+    font-size: 11px;
+    color: #555;
+}
+
+.timerDisplay {
+    font-size: 12px;
+    font-weight: 500;
+    color: #e8e8e8;
+}
+
 /* ── List section ────────────────────────────── */
 .list-label {
     font-size: 10px;

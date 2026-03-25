@@ -1,5 +1,9 @@
 const STORAGE_KEY = 'blockedSites';
 const ENABLED_KEY = 'blockingEnabled';
+const TIMER_KEY = 'currentTime';
+
+let currentTime = 0;
+let countdownInterval = null;
 
 const siteInput = document.getElementById('siteInput');
 const addBtn = document.getElementById('addBtn');
@@ -9,6 +13,8 @@ const emptyMsg = document.getElementById('emptyMsg');
 const countEl = document.getElementById('count');
 const toggle = document.getElementById('enabledToggle');
 const toggleLabel = document.getElementById('toggleLabel');
+const timerBtn = document.querySelector('.timerBtn');
+const timerDisplay = document.getElementById('timerDisplay');
 
 // ── Helpers ────────────────────────────────────
 
@@ -106,16 +112,61 @@ function removeSite(domain) {
     });
 }
 
+function addTime() {
+    currentTime += 5 * 60;
+    updateTimerDisplay();
+    startCountdown();
+
+    saveEnabled(true, () => applyEnabledState(true));
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(currentTime / 60);
+    const seconds = currentTime % 60;
+    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function startCountdown() {
+    if (countdownInterval) return; // already running
+    countdownInterval = setInterval(() => {
+        if (currentTime <= 0) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            currentTime = 0;
+            updateTimerDisplay();
+            chrome.storage.local.set({ [TIMER_KEY]: currentTime });
+            saveEnabled(false, () => applyEnabledState(false));
+            return;
+        }
+        currentTime--;
+        updateTimerDisplay();
+        chrome.storage.local.set({ [TIMER_KEY]: currentTime });
+    }, 1000);
+}
+
+
 // ── Init ───────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
     // Load both values in one go
-    chrome.storage.local.get([STORAGE_KEY, ENABLED_KEY], (result) => {
+    chrome.storage.local.get([STORAGE_KEY, ENABLED_KEY, TIMER_KEY], (result) => {
         renderList(result[STORAGE_KEY] || []);
         applyEnabledState(result[ENABLED_KEY] ?? false);
+        currentTime = result[TIMER_KEY] || 0;
+        updateTimerDisplay();
+        if (currentTime > 0) startCountdown();
+    });
+
+    timerBtn.addEventListener('click', () => {
+        addTime();
+        chrome.storage.local.set({ [TIMER_KEY]: currentTime });
     });
 
     toggle.addEventListener('change', () => {
+        if (!toggle.checked && currentTime > 0) {
+            toggle.checked = true;
+            return;
+        }
         saveEnabled(toggle.checked, () => applyEnabledState(toggle.checked));
     });
 
